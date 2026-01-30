@@ -2,43 +2,80 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Kasyu Cipher</title>
+  <title>한글 암호 변환기</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 30px; }
-    input, button { font-size: 18px; padding: 8px; margin-top: 10px; }
-    #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      font-size: 18px;
+    }
+    .output {
+      margin-top: 15px;
+      font-size: 20px;
+      background: #222;
+      padding: 10px;
+      min-height: 40px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>한글 → 숫자 암호 변환기</h2>
-  <p>한글을 입력하세요:</p>
+<h2>🔐 한글 → 숫자 암호 변환기</h2>
 
-  <input type="text" id="inputText" placeholder="예: 주">
-  <br>
-  <button onclick="convert()">변환</button>
+<textarea id="input" placeholder="한글을 입력해라"></textarea>
 
-  <div id="result"></div>
+<div class="output" id="output"></div>
 
-  <script>
-    const codeMap = {
-      "ㅂ":"1","ㅁ":"1.5","ㅋ":"1.75","ㅈ":"2","ㄴ":"2.5","ㅌ":"2.75","ㄷ":"3",
-      "ㅇ":"3.5","ㅊ":"3.75","ㄱ":"4","ㄹ":"4.5","ㅍ":"4.75","ㅅ":"5","ㅎ":"5.5",
-      "ㅠ":"5.75","ㅛ":"6","ㅗ":"6.5","ㅜ":"6.75","ㅕ":"7","ㅓ":"7.5","ㅡ":"7.75",
-      "ㅑ":"8","ㅏ":"8.5","ㅐ":"9","ㅣ":"9.5","ㅔ":"0","ㅃ":"11","ㅉ":"22","ㄸ":"33",
-      "ㄲ":"44","ㅆ":"55","ㅒ":"99","ㅖ":"00"
-    };
+<script>
+const map = {
+  "ㅂ":"1","ㅁ":"1.5","ㅋ":"1.75","ㅈ":"2","ㄴ":"2.5",
+  "ㅌ":"2.75","ㄷ":"3","ㅇ":"3.5","ㅊ":"3.75",
+  "ㄱ":"4","ㄹ":"4.5","ㅍ":"4.75","ㅅ":"5",
+  "ㅎ":"5.5","ㅠ":"5.75","ㅛ":"6","ㅗ":"6.5",
+  "ㅜ":"6.75","ㅕ":"7","ㅓ":"7.5","ㅡ":"7.75",
+  "ㅑ":"8","ㅏ":"8.5","ㅐ":"9","ㅣ":"9.5",
+  "ㅔ":"0",
+  "ㅃ":"11","ㅉ":"22","ㄸ":"33","ㄲ":"44",
+  "ㅆ":"55","ㅒ":"99","ㅖ":"00"
+};
 
-    function convert() {
-      const text = document.getElementById("inputText").value;
-      let output = [];
-      for (let ch of text) {
-        if (codeMap[ch]) { output.push(codeMap[ch]); }
-      }
-      document.getElementById("result").innerText =
-        output.length ? output.join(" ") : "변환할 수 없음";
+const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+
+function decompose(char) {
+  const code = char.charCodeAt(0) - 0xAC00;
+  if (code < 0 || code > 11171) return [char];
+
+  const cho = CHO[Math.floor(code / 588)];
+  const jung = JUNG[Math.floor((code % 588) / 28)];
+
+  return [cho, jung];
+}
+
+document.getElementById("input").addEventListener("input", e => {
+  const text = e.target.value;
+  let result = [];
+
+  for (let ch of text) {
+    if (ch === " ") {
+      result.push(" / ");
+      continue;
     }
-  </script>
+    const parts = decompose(ch);
+    for (let p of parts) {
+      if (map[p]) result.push(map[p]);
+    }
+  }
+
+  document.getElementById("output").innerText = result.join(" ");
+});
+</script>
 
 </body>
 </html>
