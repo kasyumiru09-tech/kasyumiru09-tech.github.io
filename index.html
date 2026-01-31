@@ -1,37 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>한글 암호 변환기</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      padding: 20px;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      font-size: 18px;
-    }
-    .output {
-      margin-top: 15px;
-      font-size: 20px;
-      background: #222;
-      padding: 10px;
-      min-height: 40px;
-    }
-  </style>
-</head>
-<body>
-
-<h2>🔐 한글 → 숫자 암호 변환기</h2>
-
-<textarea id="input" placeholder="한글을 입력해라"></textarea>
-
-<div class="output" id="output"></div>
-
 <script>
 const map = {
   "ㅂ":"1","ㅁ":"1.5","ㅋ":"1.75","ㅈ":"2","ㄴ":"2.5",
@@ -47,6 +13,17 @@ const map = {
 
 const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+
+const JUNG_SPLIT = {
+  "ㅘ":["ㅗ","ㅏ"],
+  "ㅙ":["ㅗ","ㅐ"],
+  "ㅚ":["ㅗ","ㅣ"],
+  "ㅝ":["ㅜ","ㅓ"],
+  "ㅞ":["ㅜ","ㅔ"],
+  "ㅟ":["ㅜ","ㅣ"],
+  "ㅢ":["ㅡ","ㅣ"]
+};
 
 function decompose(char) {
   const code = char.charCodeAt(0) - 0xAC00;
@@ -54,8 +31,19 @@ function decompose(char) {
 
   const cho = CHO[Math.floor(code / 588)];
   const jung = JUNG[Math.floor((code % 588) / 28)];
+  const jong = JONG[code % 28];
 
-  return [cho, jung];
+  let result = [cho];
+
+  if (JUNG_SPLIT[jung]) {
+    result.push(...JUNG_SPLIT[jung]);
+  } else {
+    result.push(jung);
+  }
+
+  if (jong) result.push(jong);
+
+  return result;
 }
 
 document.getElementById("input").addEventListener("input", e => {
@@ -76,6 +64,3 @@ document.getElementById("input").addEventListener("input", e => {
   document.getElementById("output").innerText = result.join(" ");
 });
 </script>
-
-</body>
-</html>
