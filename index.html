@@ -1,3 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>한글 암호 변환기</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      font-size: 18px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    .output {
+      margin-top: 15px;
+      font-size: 20px;
+      background: #222;
+      padding: 10px;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🔐 한글 → 숫자 암호 변환기</h2>
+
+<textarea id="input" placeholder="한글을 입력해라"></textarea>
+
+<div class="output" id="output"></div>
+
 <script>
 const map = {
   "ㅂ":"1","ㅁ":"1.5","ㅋ":"1.75","ㅈ":"2","ㄴ":"2.5",
@@ -25,6 +62,20 @@ const JUNG_SPLIT = {
   "ㅢ":["ㅡ","ㅣ"]
 };
 
+const JONG_SPLIT = {
+  "ㄳ":["ㄱ","ㅅ"],
+  "ㄵ":["ㄴ","ㅈ"],
+  "ㄶ":["ㄴ","ㅎ"],
+  "ㄺ":["ㄹ","ㄱ"],
+  "ㄻ":["ㄹ","ㅁ"],
+  "ㄼ":["ㄹ","ㅂ"],
+  "ㄽ":["ㄹ","ㅅ"],
+  "ㄾ":["ㄹ","ㅌ"],
+  "ㄿ":["ㄹ","ㅍ"],
+  "ㅀ":["ㄹ","ㅎ"],
+  "ㅄ":["ㅂ","ㅅ"]
+};
+
 function decompose(char) {
   const code = char.charCodeAt(0) - 0xAC00;
   if (code < 0 || code > 11171) return [char];
@@ -41,7 +92,13 @@ function decompose(char) {
     result.push(jung);
   }
 
-  if (jong) result.push(jong);
+  if (jong) {
+    if (JONG_SPLIT[jong]) {
+      result.push(...JONG_SPLIT[jong]);
+    } else {
+      result.push(jong);
+    }
+  }
 
   return result;
 }
@@ -64,3 +121,6 @@ document.getElementById("input").addEventListener("input", e => {
   document.getElementById("output").innerText = result.join(" ");
 });
 </script>
+
+</body>
+</html>
